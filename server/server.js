@@ -1,9 +1,9 @@
 import express from 'express'
+import config from './../config/config'
+import app from './express'
 
 // dev only
 import devBundle from './devBundle'
-
-const app = express();
 
 // dev only
 devBundle.compile(app);
@@ -19,19 +19,19 @@ app.get('/', (req, res) => {
      res.status(200).send(template());
 })
 
-// connect to mongodb
-import { MongoClient } from 'mongodb';
-const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/mern_simple';
-MongoClient.connect(url, (err, db)=>{
-  console.log("Connected successfully to mongodb server");
-  db.close();
+// connect to mongodb using Mongoose
+import mongoose from 'mongoose'
+
+mongoose.Promise = global.Promise
+mongoose.connect(config.mongoUri)
+
+mongoose.connection.on('error', () => {
+  throw new Error(`unable to connect to database: ${mongoUri}`)
 })
 
-// listen on port
-let port = process.env.PORT || 3000
-app.listen(port, function onStart(err) {
+app.listen(config.port, (err) => {
   if (err) {
-    console.log(err);
+    console.log(err)
   }
-  console.info('Server started on port %s.', port);
+  console.info('Server started on port %s.', config.port)
 })
