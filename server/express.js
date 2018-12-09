@@ -14,9 +14,21 @@ app.use(compress())
 app.use(helmet())
 app.use(cors())
 
+// Hello World!
 import Template from './../template'
 app.get('/', (req, res) => {
     res.status(200).send(Template())
-  })
+})
 
+import userRoutes from './routes/user.routes'
+app.use('/', userRoutes)
+
+import authRoutes from './routes/auth.routes'
+app.use('/', authRoutes)
+
+app.use((err, req, res, next) => {
+    if (err.name === 'UnauthorizedError') {
+      res.status(401).json({"error" : err.name + ": " + err.message})
+    }
+})
 export default app
